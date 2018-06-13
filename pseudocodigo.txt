@@ -1,0 +1,604 @@
+----Definicion de los pines para los botones
+subir pin b4
+bajar pin b5
+enter pin b6
+esc pin b7
+----Definicion de los pines para los leds de alarma
+temperatura pin a4
+humedad pin a5
+LGP pin a6 (gasX)
+alcohol pin a7 (gasY)
+----variables globales
+---------variables para el control del menu en el lcd--------
+variable para controlar la posicion del menu
+variable para controlar el tiempo de actualizacion del menu.
+variable para controlar el tiempo de actulizacion del mensaje a travez de serial
+
+---------Banderas
+bandera mensaje de bienvenida en falso
+bandera menu de configuraciones en falso
+bandera configuracion serial en falso
+bandera configuracion de tiempo de actualizacion de lcd en falso
+bandera menu de configuraciones de alarma en falso
+bandera configuracion de alarma de temperatura en falso 
+bandera configuracion de alarma de humedad en falso
+bandera configuracion de alarma de gasX en falso
+bandera configuraciones de alarma de gasY en falso
+
+----------variables para obtener el tiempo en que se actualizara la comunicacion
+variable para el tiempo especificado de la comunicacion serial
+variable de uso auxiliar para la modificacion del tiempo de comunicacion serial
+variablepara el tiempo especificado de la actualizacion del lcd
+variable de uso auxiliar para la modificacion del tiempo de actualizacion lcd
+
+----------variables para las alarmas
+variable para almacenar el valor de la alarma de temperatura
+variable de uso auxiliar para almacenar los cambios sin guardar en la variable de alarma de temperatura.
+variable para almacenar el valor de la alarma de humedad
+variable de uso auxiliar para almacenar los cambios sin guardar en la variable de alarma de humedad
+variable para almacenar el valor de la alarma de gasX
+variable de uso auxiliar para almacenar los cambios sin guardar en la variable de alarma de gasX
+variable para almacenar el valor de la alarma de gasY
+variable de uso auxiliar para almacenar los cambios sin guardar en la variable de alarma de gasY
+
+-----------Variables para almacenar el resultado de lo sensado
+variable para temperatura
+variable para humedad
+variable para GasX
+variable para GasY
+
+---------Funcion de bienvenida
+inicio funcion bienvenida
+	si bandera de mensaje bienvenida es falso
+		En la linea 1 del lcd
+		mostrar lo siguiente "-------VLM------"
+		En la linea 2 del lcd
+		mostrar lo siguiente "  Bienvenido    "
+		una pausa 
+		Limpiar ambas lineas del lcd
+		En la linea 1 del lcd
+		mostrar lo siguiente "cargando..."
+		recorrido hasta el final de la linea 2
+			En la linea 1 en la posicion del recorrido
+			mostrar lo siguiente "*"
+			pausa
+		fin de recorrido
+		limpiar ambas lineas del lcd 
+		bandera mensaje bienvenida en verdadero.
+	fin si
+fin funcion bienvenida
+
+----------Funcion del menu
+inicio funcion menu
+	segun la variable posicion del menu
+		caso 1 
+			en la linea 1 del lcd
+			mostrar "-->tem: valor°C"
+			en la linea 2 del lcd
+			mostrar "hum: valor%"
+		fin caso 1
+		caso 2
+			en la linea 1 del lcd
+			mostrar "-->hum: valor%"
+			en la linea 2 del lcd
+			mostrar "LPG: valor%"
+		fin caso 2
+		caso 3
+			en la linea 1 del lcd 
+			mostrar "-->lpg: valor%"
+			en la linea 2 del lcd
+			mostrar "Alcohol: valor%"
+		fin caso 3
+		caso 4
+			en la linea 1 del lcd
+			mostrar "-->Alcohol: valor%"
+			en la linea 1 del lcd
+			mostrar "tem: valor%"
+		fin caso 4
+	fin segun 
+fin funcion menu
+
+-----Funcion del menu de configuraciones
+inicio funcion menu configuraciones
+	segun la variable posicion del menu
+		caso 1
+			en la linea 1 del lcd
+			mostrar ">conf Serial"
+			en la linea 2 del lcd 
+			mostrar "conf update lcd"
+		fin caso 1
+		caso 2
+			en la linea 1 del lcd
+			mostrar ">conf update lcd"
+			en la linea 2 del lcd
+			mostrar "conf alarmas"
+		fin caso 2
+		caso 3
+			en la linea 1 del lcd 
+			mostrar ">conf alarmas"
+			en la linea 2 del lcd 
+			mostrar "conf serial"
+		fin caso 3
+	fin segun
+fin funcion
+
+-------Funcion menu configuracion serial
+inicio funcion menu configuracion serial
+	en la linea 1 del lcd
+	mostrar " Tiempo "
+	en la linea 2 del lcd
+	mostrar "valor de variable auxiliar tiempo de comunicacion serial"
+fin funcion
+
+-------Funcion menu configuracion actualizacion lcd
+inicio funcion menu configuracion actualizacion lcd
+	en la linea 1 del lcd 
+	mostrar "Tiempo"
+	en la linea 2 del lcd
+	mostrar "valor de la variable auxiliar de tiempo de actualizacion lcd"
+fin funcion
+
+-------Funcion menu de alarmas
+inicio funcion menu de alarmas
+	segun la variable de posicion del menu
+		caso 1 
+			en la linea 1 del lcd
+			mostrar "-->tem: valor°C"
+			en la linea 2 del lcd
+			mostrar "hum: valor%"
+		fin caso 1
+		caso 2
+			en la linea 1 del lcd
+			mostrar "-->hum: valor%"
+			en la linea 2 del lcd
+			mostrar "LPG: valor%"
+		fin caso 2
+		caso 3
+			en la linea 1 del lcd 
+			mostrar "-->lpg: valor%"
+			en la linea 2 del lcd
+			mostrar "Alcohol: valor%"
+		fin caso 3
+		caso 4
+			en la linea 1 del lcd
+			mostrar "-->Alcohol: valor%"
+			en la linea 1 del lcd
+			mostrar "tem: valor%"
+		fin caso 4 
+	fin segun 
+fin funcion
+
+---------Funcion menu configurar la alarma temperatura
+inicio funcion configurar alarma temperatura
+	en la linea 1 
+	mostrar "temperatura"
+	en la linea 2
+	mostrar "el valor de la variable auxiliar para almacenar el valor de la alarma"
+fin funcion.
+
+---------Funcion menu configurar la alarma humedad
+inicio funcion configurar alarma humedad
+	en la linea 1
+	mostrar "humedad"
+	en la linea 2
+	mostrar "el valor de la variable auxiliar para almacenar el valor de la alarma"
+fin funcion
+
+--------Funcion menu configurar la alarma gasX
+inicio funcion configurar alarma gasX
+	en la linea 1
+	mostrar "LPG"
+	en la linea 2 
+	mostrar "valor de la variable auxiliar para almacenar el valor de la alarma"
+fin funcion
+
+--------Funcion de menu configurar la alarma gasY
+inicio funcion configurar alarma gasY
+	en la linea 1
+	mostrar "Alcohol"
+	en la linea 2
+	mostrar "valor de la variable auxiliar para almacenar el valor de la alarma"
+fin funcion
+
+--------Funcion para mostrar todos los menus
+inicio funcion mostrar todos los menus
+	mando llamar funcion bienvenida
+	si bandera de configuraciones es verdadera
+		si bandera configuracion serial es falsa y bandera configuracion de tiempo de actualizacion de lcd es falsa y si bandera de menu de configuraciones de alarmas es falsa
+			mando llamar la funcion del menu de configuraciones
+		fin si
+		si bandera configuracion serial es verdadera
+			mando llamar el menu de configuracion serial
+		fin si
+		si bandera de configuracion del tiempo de actualizacion de lcd es verdadera
+			mando llamar el menu de configuracion de actualizacion de lcd
+		fin si
+		si bandera de configuraciones de alarmas es verdadera
+			si bandera de confiracion de alarma temperatura es verdadera
+				mando llamar la funcion del menu de configuracion de alarma de temperatura 
+			fin si
+			si no, si bandera de configuracion de alarma humedad es verdadera
+				mando llamar la funcion del menu de configuracion de alarma de humedad
+			fin si 
+			si no, si bandra de configuraciones de alarma gasX es verdadera
+				mando llamar la funcion del menu de configuraciones de alarma de gasX
+			fin si
+			si no, si bandera de configuraciones de alarma gasY es verdadera
+				mando llamar la funcion del menu de configuraciones de alarma de gasY
+			fin si
+			si no
+				mando llamar la funcion del menu de alarmas
+			fin si no
+		fin si
+	fin si
+	si no
+		mando llamar la funcion del menu
+	fin si no
+fin funcion
+
+---------------Funcion de lectura de temperatura y humedad
+inicio funcion 
+	vairable de humedad igual a readData
+	lectura basura igual a readData
+	variable de temperatura igual a readData
+	lectura basura igual a readData
+	lectura del checksum igual a readData
+fin funcion
+
+---------------Funcion de lectura de gasX
+inicio funcion lectura gasX
+	entro al canal 0 del adc
+	variable de gasX igual a read_adc(solo lectura);
+	pausa de 1 ms
+	read_adc(inicio)
+fin funcion 
+
+---------------Funcion de lectura de gasY
+inicio funcion lectura gasY
+	entro al canal 1 del adc
+	variable de gasY igual a read_adc(solo lectura);
+	pausa de 1 ms
+	read_adc(inicio)
+fin funcion 
+
+------------Funcion de comunicacion serial
+inicio funcion de lo que enviare por serial
+	si variable para controlar el tiempo para la comunicacion serial es mayor o igual a la  variable de actualizacion de comunicacion serial
+		mostrar "alarmas"
+		mostrar "temperatura: valor de la variable de alarma temperatura"
+		mostrar "humedad : valor de la variable de alarma humedad"
+		mostrar "LPG: valor de la variable de la alarma gasX"
+		mostrar "Alcohol: valor de la variable de la alarma gasY"
+		variable para controlar el tiempo de comunicacion es igual a 1
+	fin si
+	si no
+		variable para controlar el tiempo de comunicacion se incrementa en 1
+	fin si no
+fin funcion
+
+-----------Funcion de actuzalicacion del lcd
+inicio funcion de actulizacion del lcd
+	si variable para controlar el tiempo para actulizar lcd es mayor o igual a la variable de actulizacion de lcd 
+		mando llamar funcion de lectura humedad y temperatura
+		mando llamar funcion de lectura gasX
+		mando llamar funcion de lectura gasY
+		variable para controlar el tiempo para actulizar el lcd es igual a 1
+	fin si
+	si no
+		variable para controlar el tiempo para actualizar el lcd se incrementa en 1
+	fin si no
+fin funcion
+
+------------funcion de validacion de las alarmas
+inicio funcion de validacion de alarmas
+	si variable temperatura es mayor a variable de alarma temperatura
+		pongo en alto el puerto del led correspondiente
+	fin si 
+	si no 
+		pongo en bajo el puerto del led correspondiente
+	fin si no
+	
+	si variable humedad es mayor a variable de alarma humedad
+		pongo en alto el puerto del led correspondiente
+	fin si
+	si no
+		pongo en bajo el puerto del led correspondiente
+	fin si no
+
+	si variable gasX es mayor a variable de alarma gasX
+		pongo en alto el puerto del led correspondiente
+	fin si
+	si no
+		pongo en bajo el puerto del led correspondiente
+	fin si no
+
+	si variable gasY es mayor a variable de alarma gasY
+		pongo en alto el puerto del led correspondiente
+	fin si
+	si no
+		pongo en bajo el puerto del led correspondiente
+	fin si no
+fin funcion
+
+--------------Funcion de interrupcion puerto B
+inicio interrupcion
+declaro interrupcion
+inicio la funcionalidad
+	--boton subir
+	si en la entrada del pin del boton subir esta un 1 logico
+		si bandera configuraciones es falsa
+			si posicion del menu es igual a 4
+				posicion del menu es 1
+			fin si
+			si no
+				posicion del menu se incrementa en 1
+			fin si no
+		fin si
+		si no
+			si bandera de configuracion serial es verdadera
+				si variable auxiliar de tiempo comunicacion serial es igual a 100
+					variable auxiliar de tiempo de comunicacion serial es 50000
+				fin si
+				si no
+					variable auxiliar de tiempo de comunicacion serial se decrementa en 100
+				fin si no
+			fin si
+			si bandera de configuracion actualizacion lcd es verdadera
+				si variable auxiliar de tiempo actualizacion lcd es igual a 100
+					variable auxiliar de tiempo actualizacion lcd es 2000
+				fin si
+				si no
+					variable auxiliar de tiempo actualizacion lcd se decrementa 100
+				fin si no
+			fin si
+			si bandera menu confiruacion alarmas es verdadera
+				si bandera configuracion temperatura es verdadera
+					si variable auxiliar de valor de alarma de temperatura es igual a 1
+						variable auxiliar de valor de alarma de temperatura es 49
+					fin si
+					si no
+						variable auxiliar de valor de alarma de temperatura se decrementa en 1
+					fin si
+				fin si
+				si bandera configuracion humedad es verdadera
+					si variable auxiliar de valor de alarma de humedad es igual a 21
+						variable axuliar de valor de alarma de humedad es 94
+					fin si
+					si no
+						variable auxiliar de valor de alarma de humedad se decrementa 1
+					fin si no
+				fin si
+				si bandera de configuracion gasX es verdadera
+					si variable auxiliar de valor de alarma de gasX es igual a 300
+						variable auxiliar de valor de alarma de gasX es 10000
+					fin si
+					si no
+						variable auxiliar de valor de alarma de gasX se decrementa 100
+					fin si no
+ 				fin si
+				si bandera de configuracion de gasY es verdadera
+					si variable auxiliar de valor de alarma de gasY es igual a 300
+						variable auxiliar de valor de alarma de gasY es 10000
+					fin si
+					si no
+						variable auxiliar de valor de alarma de gasY se decrementa 100
+					fin si no
+				fin si
+				si variable posicion de menu es igual a 4
+					variable posicion de menu es 1
+				fin si
+				si no
+					variable posicion de menu se decrementa 1
+				fin si no
+			fin si
+			si no
+				si variable posicion de menu es igual a 3
+					variable posicion de menu es 1
+				fin si
+				si no
+					variable posicion de menu se decrementa 1
+				fin si no
+			fin si no
+		fin si no
+		limpiamos la pantalla del lcd
+	fin si 
+	
+	--boton bajar
+	si en el pin del boton bajar esta un 1 logico
+		si bandera de configuraciones esta en falso
+			si variable posicion del menu es igual a 1
+				variable posicion del menu es igual a 4
+			fin si
+			si no
+				variable posicion del menu se decrementa 1
+			fin si no
+		fin si
+		si no
+			si bandera de configuracion serial es verdadera
+				si variable auxiliar de tiempo comunicacion serial es igual a 50000
+					variable auxiliar de tiempo de comunicacion serial es 100
+				fin si
+				si no
+					variable auxiliar de tiempo de comunicacion serial se incrementa en 100
+				fin si no
+			fin si
+			si bandera de configuracion actualizacion lcd es verdadera
+				si variable auxiliar de tiempo actualizacion lcd es igual a 2000
+					variable auxiliar de tiempo actualizacion lcd es 100
+				fin si
+				si no
+					variable auxiliar de tiempo actualizacion lcd se incrementa 100
+				fin si no
+			fin si
+			si bandera menu confiruacion alarmas es verdadera
+				si bandera configuracion temperatura es verdadera
+					si variable auxiliar de valor de alarma de temperatura es igual a 49
+						variable auxiliar de valor de alarma de temperatura es 1
+					fin si
+					si no
+						variable auxiliar de valor de alarma de temperatura se incrementa en 1
+					fin si
+				fin si
+				si bandera configuracion humedad es verdadera
+					si variable auxiliar de valor de alarma de humedad es igual a 94
+						variable axuliar de valor de alarma de humedad es 21
+					fin si
+					si no
+						variable auxiliar de valor de alarma de humedad se incrementa 1
+					fin si no
+				fin si
+				si bandera de configuracion gasX es verdadera
+					si variable auxiliar de valor de alarma de gasX es igual a 10000
+						variable auxiliar de valor de alarma de gasX es 300
+					fin si
+					si no
+						variable auxiliar de valor de alarma de gasX se incrementa 100
+					fin si no
+ 				fin si
+				si bandera de configuracion de gasY es verdadera
+					si variable auxiliar de valor de alarma de gasY es igual a 10000
+						variable auxiliar de valor de alarma de gasY es 300
+					fin si
+					si no
+						variable auxiliar de valor de alarma de gasY se incrementa 100
+					fin si no
+				fin si
+				si variable posicion de menu es igual a 1
+					variable posicion de menu es 4
+				fin si
+				si no
+					variable posicion de menu se incrementa 1
+				fin si no
+			fin si
+			si no
+				si variable posicion de menu es igual a 1
+					variable posicion de menu es 3
+				fin si
+				si no
+					variable posicion de menu se incrementa 1
+				fin si no
+			fin si no
+		fin si no
+		limpiamos la pantalla del lcd
+	fin si		
+
+	--Boton enter
+	si en el pin del boton entrar esta en 1 logico
+		si bandera configuraciones es verdadera
+			si bandera de configuracion serial es falsa y bandera de configuracion actualizacion lcd es falsa y bandera menu configuracion alarmas es falsa
+				segun la variable posicion del menu
+					caso 1
+						bandera configuracion serial es verdadera
+					fin caso 1
+					caso 2
+						bandera configuracion actualizacion lcd es verdadera
+					fin caso 2
+					caso 3
+						bandera menu configuraciones alarmas es verdadera
+						variable posicion del menu es 1
+					fin caso 3
+				fin segun
+			fin si
+			si no
+				si bandera configuracion serial es verdadera 
+					variable de tiempo serial es igual a variable auxiliar de tiempo serial
+				fin si
+				si bandera configuracion actualizacion lcd es verdadera
+					variable de tiempo actualizacion lcd es igual a variable auxiliar de actualizacion lcd
+				fin si 
+				si bandera menu configuraciones alarmas es verdadera
+					segun la variable posicion del menu
+						caso 1
+							bandera configuracion temperatura es verdadera
+						fin caso
+						caso 2
+							bandera configuracion humedad es verdadera
+						fin caso
+						caso 3
+							bandera configuracion gasX es verdadera
+						fin caso 
+						caso 4
+							bandera configuracion gasY es verdadera
+						fin caso
+					fin segun
+				fin si
+				si no
+					si bandera configuracion temperatura es verdadera
+						variable alarma temperatura es igual a variable auxiliar alarma temperatura
+					fin si
+					si bandera configuracion humedad es verdadera
+						variable alarma humedad es igual a variable auxiliar alarma humedad
+					fin si
+					si bandera configuracion gasX es verdadera
+						variable alarma gasX es igual a variable auxiliar alarma gasX
+					fin si
+					si bandera configuracion gasY es verdadera
+						variable alarma gasX es igual a variable auxiliar alarma gasY
+					fin si
+				fin si no
+			fin si no
+		fin si
+		si bandera configuracion es falsa
+			bandera configuracion es verdadera
+			variable posicion menu es 1
+		fin si
+		limpiamos la pantalla del lcd
+	fin si
+	
+	--boton escape
+	si en el pin del boton escape esta un 1 logico
+		si bandera configuracion es verdadera
+			si bandera configuracion serial es verdadera
+				bandera de configuracion es falsa
+			fin si
+			si no, si bandera configuracion actualizacion lcd es verdadera
+				bandera de configuracion actualizacion lcd es falsa
+			fin si
+			si no, si bandera menu configuracion alarmas es verdadera
+				si bandera de configuracion temperatura es verdadera
+					bandera configuracion temperatura es falsa
+				fin si
+				si no,si bandera de configuracion humedad es verdadera 
+					bandera configuracion humedad es falsa
+				fin si
+				si no, si bandera configuracion gasX es verdadera
+					bandera configuracion gasX es falsa
+				fin si
+				si no, si bandera configuracion gasY es verdadera
+					bandera configuracion gasY es falsa
+				fin si
+				si no
+					bandera menu configuraciones es falsa
+					variable posicion del menu es 1
+				fin si no
+			fin si no
+		fin si no
+			bandera configuracion es  falsa
+			variable posicion menu es 1
+		fin si no
+		limpiamos pantalla del lcd
+	fin si
+fin funcion
+
+-----------------Funcion principal
+inicio funcion principal
+	configur el osicilador a 16 mhz
+	configurar el divisor del adc
+	configurar los puertos que seran configurados
+	habilitar la interrupcion del puerto B
+	habilitar la interrupcion global
+	poner en modo entrada solo los pines a0 y a1 los demas en modo salida
+	poner en modo salida el puerto d
+	poner en modo entrada el puerto c
+	inicializar el lcd
+	mientras que 1
+		iniciamos la comunicacion con el sensor DHT11
+		si el retorno del checkSum es 1
+			mandar llamar la funcion comunicacion ldc
+			mandar llamar la funcion comunicacion serial
+			mandar llamar la funcion todos los menus
+			mandar llamar la funcion alarmas
+		fin si
+	fin mientras
+fin inicio
+						
