@@ -53,11 +53,11 @@ long tiempoLCD = 100;    long auxiliarLCD = 100;
 //Variable para las alarmas.
 int alarmaTemp = 30; int auxiliarAT = 30;
 int alarmaHum = 30;  int auxiliarAH = 30;
-long alarmaLPG = 300; long auxiliarALPG = 300;
-long alarmaAlcohol = 300; long auxiliarAA=300;
+long alarmaLPG = 1000; long auxiliarALPG = 1000;
+long alarmaAlcohol = 1000; long auxiliarAA = 1000;
 //Variables para lo sensado
-int temp=0;
-int hum=0;
+int temp=0; int auxTemp=0;
+int hum=0; int auxHum = 0;
 long GasX=0;
 long GasY=0;
 //variables para funciones del PI
@@ -101,17 +101,17 @@ void menu()
          lcd_gotoxy(1,1);//Linea donde pintare.
          printf(lcd_putc,"->Hum:       %d%%",hum);
          lcd_gotoxy(1,2);//Linea donde pintare.
-         printf(lcd_putc,"LPG:       %ld%%  ",GasX);
+         printf(lcd_putc,"LPG:      %ldppm ",GasX);
       break;
       case 3:
          lcd_gotoxy(1,1);//Linea donde pintare.
-         printf(lcd_putc,"->LPG:     %ld%% ",GasX);
+         printf(lcd_putc,"->LPG:    %ldppm ",GasX);
          lcd_gotoxy(1,2);//Linea donde pintare.
-         printf(lcd_putc,"Alcohol:   %ld%% ",GasY);
+         printf(lcd_putc,"Alcohol:  %ldppm ",GasY);
       break;
       case 4:
          lcd_gotoxy(1,1);//Linea donde pintare.
-         printf(lcd_putc,"->Alcohol: %ld%% ",GasY);
+         printf(lcd_putc,"->Alcohol:%ldppm",GasY);
          lcd_gotoxy(1,2);//Linea donde pintare.
          printf(lcd_putc,"Tem:        %d%cC"temp,223);
       break;
@@ -177,17 +177,17 @@ void confAlarmaMenu()
          lcd_gotoxy(1,1);//Linea donde pintare.
          printf(lcd_putc,"->Hum       %d%%",alarmaHum);
          lcd_gotoxy(1,2);//Linea donde pintare.
-         printf(lcd_putc,"LPG:       %ld%%",alarmaLPG);
+         printf(lcd_putc,"LPG:      %ldppm",alarmaLPG);
       break;
       case 3:
          lcd_gotoxy(1,1);//Linea donde pintare.
-         printf(lcd_putc,"->LPG:     %ld%%",alarmaLPG);
+         printf(lcd_putc,"->LPG:   %ldppm",alarmaLPG);
          lcd_gotoxy(1,2);//Linea donde pintare.
-         printf(lcd_putc,"Alcohol:   %ld%%",alarmaAlcohol);
+         printf(lcd_putc,"Alcohol: %ldppm",alarmaAlcohol);
       break;
       case 4:
          lcd_gotoxy(1,1);//Linea donde pintare.
-         printf(lcd_putc,"->Alcohol: %ld%%",alarmaAlcohol);
+         printf(lcd_putc,"->Alcohol:%ldppm",alarmaAlcohol);
          lcd_gotoxy(1,2);//Linea donde pintare.
          printf(lcd_putc,"Temp       %d%cC",alarmaTemp,223);
       break;
@@ -219,17 +219,16 @@ void confAlamarGasX()
    lcd_gotoxy(1,1);//Linea donde pintare.
    printf(lcd_putc,"  LPG   ");
    lcd_gotoxy(1,2);//Linea donde pintare.
-   printf(lcd_putc,"  %ld %%  ",auxiliarALPG);
+   printf(lcd_putc,"  %ldppm  ",auxiliarALPG);
 }
 //---------------------------------------------------------
 //Alarma gasy
 void confAlamarGasY()
 {
-   
    lcd_gotoxy(1,1);//Linea donde pintare.
    printf(lcd_putc,"    Alcohol    ");
    lcd_gotoxy(1,2);//Linea donde pintare.
-   printf(lcd_putc,"  %ld %%  ",auxiliarAA);
+   printf(lcd_putc,"  %ldppm  ",auxiliarAA);
 }
 //---------------------------------------------------------
 //Funcion de todos los menus-------------------------------
@@ -281,11 +280,8 @@ void menusAll()
 //Lectura temperatura humedad
 void senseoTemperaturaHumedad(void)
 {       
-   hum = readData(); 
-   int basura1 = readData();
-   temp = readData();
-   int basura2 = readData();
-   int basura3 = readData();   
+   hum = auxHum;
+   temp = auxTemp;
 }
 //----------------------------------------------------------
 //Lectura LPG
@@ -309,31 +305,27 @@ void Alcohol(void)
 //funcion Comunicacion Serial
 void comunicacionSerial()
 {
-   if(actualizacionSerial==tiempoSerial)
+   if(actualizacionSerial>tiempoSerial)
       {
          printf("Alarmas------------------\r");
-         printf("Temperatura:   %d\r",alarmaTemp);
-         printf("Humedad:       %d\r",alarmaHum);
-         printf("LPG:           %ld\r",alarmaLPG);
-         printf("Alcohol:       %ld\r",alarmaAlcohol);
+         printf("Temperatura:   %d°C\r",alarmaTemp);
+         printf("Humedad:       %d%%\r",alarmaHum);
+         printf("LPG:           %ldppm\r",alarmaLPG);
+         printf("Alcohol:       %ldppm\r",alarmaAlcohol);
          printf("-------------------------\r");
          actualizacionSerial=1;
-      }
-   else
-      actualizacionSerial++;
+      }      
 }
 //Funcion de actualizacion de LCD
 void comunicacionLCD()
 {
    if(actualizacionLCD>tiempoLCD)
    {  
-       senseoTemperaturaHumedad();
-       LPG();
-       Alcohol();            
-       actualizacionLCD=1;
+      senseoTemperaturaHumedad();
+      LPG();
+      Alcohol();            
+      actualizacionLCD=1;
    }
-   else
-       actualizacionLCD++;
 }
 void funcionPI()
 {
@@ -384,143 +376,138 @@ void alarmas()
       output_low(ledAlcohol);
 }
 void botones()
-{
-   
-         if(botonSubir == 1)
-            {
-               
+{   
+   if(botonSubir == 1)
+      {
          if(configuraciones==0)
-         {
-            if(posicionMenu==4)
-               posicionMenu=1;
-            else
-            posicionMenu++;
-         }
-         else
-         {
-            if(confSerial == 1)
             {
-               if(auxiliarTS==100)
-                  auxiliarTS=5000;
-               else
-                  auxiliarTS-=100;
-            }
-            else if(confUpdate == 1)
-            {
-               if(auxiliarLCD == 100)
-                  auxiliarLCD = 2000;
-               else
-                  auxiliarLCD-=100;
-            }            
-            else if(confAlarma == 1)
-            {
-               if(confTemp==1)
-               {
-                  if(auxiliarAT==1)
-                     auxiliarAT=49;
-                  else
-                     auxiliarAT-=1;                     
-               }
-               if(confHum==1)
-               {
-                  if(auxiliarAH==21)
-                     auxiliarAH=94;
-                  else
-                     auxiliarAH-=1;
-               }
-               if(confGasX==1)
-               {
-                  if(auxiliarALPG==300)
-                     auxiliarALPG=10000;
-                  else
-                     auxiliarALPG-=100;
-               }
-               if(confGasY==1)
-               {
-                  if(auxiliarAA==300)
-                     auxiliarAA=10000;
-                  else
-                     auxiliarAA-=100;
-               }
                if(posicionMenu==4)
                   posicionMenu=1;
                else
                   posicionMenu++;
             }
-            else
+         else
             {
-               if(posicionMenu==3)
-                  posicionMenu=1;
-               else
-                  posicionMenu++;
-            }            
-         }
+               if(confSerial == 1)
+                  {
+                     if(auxiliarTS==100)
+                        auxiliarTS=5000;
+                     else
+                        auxiliarTS-=100;
+                  }
+               else if(confUpdate == 1)
+                  {
+                     if(auxiliarLCD == 100)
+                        auxiliarLCD = 2000;
+                     else
+                        auxiliarLCD-=100;
+                  }            
+               else if(confAlarma == 1)
+                  {
+                     if(confTemp==1)
+                        {
+                           if(auxiliarAT==1)
+                              auxiliarAT=49;
+                           else
+                              auxiliarAT-=1;                     
+                        }
+                     if(confHum==1)
+                       {
+                          if(auxiliarAH==21)
+                             auxiliarAH=94;
+                          else
+                             auxiliarAH-=1;
+                       }
+                     if(confGasX==1)
+                       {
+                          if(auxiliarALPG==300)
+                             auxiliarALPG=10000;
+                          else
+                             auxiliarALPG-=100;
+                       }
+                     if(confGasY==1)
+                       {
+                          if(auxiliarAA==300)
+                             auxiliarAA=10000;
+                          else
+                             auxiliarAA-=100;
+                       }
+                    if(posicionMenu==4)
+                       posicionMenu=1;
+                    else
+                       posicionMenu++;
+                 }
+              else
+                 {
+                    if(posicionMenu==3)
+                       posicionMenu=1;
+                    else
+                       posicionMenu++;
+                 }            
+            }
          printf(lcd_putc,"\f");
          botonSubir=0;
-            }
-         if(botonBajar == 1)
-            {
-               
+      }
+   if(botonBajar == 1)
+      {
          if(configuraciones==0)
-         {
-            if(posicionMenu==1)
-               posicionMenu=4;
-            else
-               posicionMenu--;
-         }
-         else
-         {
-            
-            if(confSerial == 1)
             {
-               if(auxiliarTS==5000)
-                  auxiliarTS=100;
-               else
-                  auxiliarTS+=100;
-            }
-            else if(confUpdate == 1)
-            {
-               if(auxiliarLCD == 2000)
-                  auxiliarLCD = 100;
-               else
-                  auxiliarLCD+=100;
-            }
-            else if(confAlarma == 1)
-            {
-               if(confTemp==1)
-               {
-                  if(auxiliarAT==49)
-                     auxiliarAT=1;
-                  else
-                     auxiliarAT+=1;
-                     
-               }
-               if(confHum==1)
-               {
-                  if(auxiliarAH==94)
-                     auxiliarAH=21;
-                  else
-                     auxiliarAH+=1;
-               }
-               if(confGasX==1)
-               {
-                  if(auxiliarALPG==10000)
-                     auxiliarALPG=300;
-                  else
-                     auxiliarALPG+=100;
-               }
-               if(confGasY==1)
-               {
-                  if(auxiliarAA==10000)
-                     auxiliarAA=300;
-                  else
-                     auxiliarAA+=100;
-               }
                if(posicionMenu==1)
                   posicionMenu=4;
                else
                   posicionMenu--;
             }
+         else
+            {
+            if(confSerial == 1)
+               {
+                  if(auxiliarTS==5000)
+                     auxiliarTS=100;
+                  else
+                     auxiliarTS+=100;
+               }
+            else if(confUpdate == 1)
+               {
+                  if(auxiliarLCD == 2000)
+                     auxiliarLCD = 100;
+                  else
+                     auxiliarLCD+=100;
+               }
+            else if(confAlarma == 1)
+               {
+                  if(confTemp==1)
+                     {
+                        if(auxiliarAT==49)
+                           auxiliarAT=1;
+                        else
+                           auxiliarAT+=1;                     
+                     }
+                  if(confHum==1)
+                    {
+                       if(auxiliarAH==94)
+                          auxiliarAH=21;
+                       else
+                          auxiliarAH+=1;
+                    }
+                 if(confGasX==1)
+                    {
+                       if(auxiliarALPG==10000)
+                          auxiliarALPG=300;
+                       else
+                          auxiliarALPG+=100;
+                    }
+                 if(confGasY==1)
+                   {
+                      if(auxiliarAA==10000)
+                         auxiliarAA=300;
+                      else
+                         auxiliarAA+=100;
+                   }
+                 if(posicionMenu==1)
+                    posicionMenu=4;
+                 else
+                    posicionMenu--;
+                 }
             else
             {
                if(posicionMenu==1)
@@ -651,25 +638,32 @@ void botones()
              botonEsc=0;
             }
 }
+#INT_TIMER0
+void timer0()
+{
+   actualizacionSerial++;
+   actualizacionLCD++;
+   set_timer0(6);
+}
 #INT_RB
 void interrupt_isr(void)
 {     //Boton subir
-      if(input(subir)==1)
+   if(input(subir)==1)
       {
          botonSubir=1;
       }
       //Boton bajar
-      if(input(bajar)==1)
+   if(input(bajar)==1)
       {
          botonBajar = 1;
       }
       //Boton enter
-      if(input(enter)==1)
+   if(input(enter)==1)
       {
          botonEnter = 1;
       }
       //Boton salir
-      if(input(esc)==1)
+   if(input(esc)==1)
       {
          botonEsc = 1;
       }
@@ -681,7 +675,10 @@ void main()
    //Configuracion ADC
    setup_adc(ADC_CLOCK_DIV_32);
    setup_adc_ports(AN0_TO_AN1);
+   setup_timer_0(RTCC_INTERNAL | RTCC_DIV_16 | RTCC_8_BIT);
+   set_timer0(6);
    //Interrupciones.
+   enable_interrupts(INT_TIMER0);
    enable_interrupts(INT_RB);
    enable_interrupts(GLOBAL);
    set_tris_a(0x03);
@@ -694,12 +691,20 @@ void main()
       inicioDht11();
       if(respuesta())
       {
-         comunicacionLCD();
-         //comunicacionSerial();
-         menusAll();
-         alarmas();
-         botones();
-         funcionPI();
+         auxHum = readData(); 
+         int basura1 = readData();
+         auxTemp = readData();
+         int basura2 = readData();
+         int basura3 = readData();   
+         if((auxHum+basura1+auxTemp+basura2)==basura3)
+         {
+            comunicacionLCD();
+            funcionPI();
+            //comunicacionSerial();
+            menusAll();
+            alarmas();
+            botones();
+         }         
       }
       
    }
